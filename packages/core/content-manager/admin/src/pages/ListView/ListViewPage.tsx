@@ -14,6 +14,7 @@ import {
   useRBAC,
   Layouts,
   useTable,
+  UnstableGuidedTour,
 } from '@strapi/admin/strapi-admin';
 import {
   Button,
@@ -71,10 +72,8 @@ const ListViewPage = () => {
   const { formatMessage } = useIntl();
   const { toggleNotification } = useNotification();
   const { _unstableFormatAPIError: formatAPIError } = useAPIErrorHandler(getTranslation);
-
   const { collectionType, model, schema } = useDoc();
   const { list } = useDocumentLayout(model);
-
   const [displayedHeaders, setDisplayedHeaders] = React.useState<ListFieldLayout[]>([]);
 
   const listLayout = usePrev(list.layout);
@@ -277,17 +276,30 @@ const ListViewPage = () => {
           }
         />
         <Layouts.Content>
-          <Box background="neutral0" shadow="filterShadow" hasRadius>
-            <EmptyStateLayout
-              action={canCreate ? <CreateButton variant="secondary" /> : null}
-              content={formatMessage({
-                id: 'app.components.EmptyStateLayout.content-document',
-                defaultMessage: 'No content found',
-              })}
-              hasRadius
-              icon={<EmptyDocuments width="16rem" />}
-            />
-          </Box>
+          <UnstableGuidedTour domain="content-manager">
+            {(state) => {
+              return (
+                <>
+                  <Box
+                    background="neutral0"
+                    shadow="filterShadow"
+                    hasRadius
+                    ref={state.stepRefs[0]}
+                  >
+                    <EmptyStateLayout
+                      action={canCreate ? <CreateButton variant="secondary" /> : null}
+                      content={formatMessage({
+                        id: 'app.components.EmptyStateLayout.content-document',
+                        defaultMessage: 'No content found',
+                      })}
+                      hasRadius
+                      icon={<EmptyDocuments width="16rem" />}
+                    />
+                  </Box>
+                </>
+              );
+            }}
+          </UnstableGuidedTour>
         </Layouts.Content>
       </Page.Main>
     );

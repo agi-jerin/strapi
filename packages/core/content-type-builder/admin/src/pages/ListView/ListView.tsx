@@ -1,5 +1,5 @@
 /* eslint-disable import/no-default-export */
-import { useTracking, Layouts } from '@strapi/admin/strapi-admin';
+import { useTracking, Layouts, UnstableGuidedTour } from '@strapi/admin/strapi-admin';
 import { Box, Button, Flex, Typography } from '@strapi/design-system';
 import { Information, Pencil, Plus } from '@strapi/icons';
 import upperFirst from 'lodash/upperFirst';
@@ -170,7 +170,13 @@ const ListView = () => {
           overflow="auto"
           borderColor="neutral150"
         >
-          <List type={type} addComponentToDZ={handleClickAddComponentToDZ} isMain />
+          <UnstableGuidedTour domain="content-type-builder">
+            {(state) => (
+              <div ref={state.stepRefs[0]}>
+                <List type={type} addComponentToDZ={handleClickAddComponentToDZ} isMain />
+              </div>
+            )}
+          </UnstableGuidedTour>
         </Box>
       </Layouts.Content>
     </>

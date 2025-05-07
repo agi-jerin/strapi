@@ -7,6 +7,7 @@ import {
   useRBAC,
   useNotification,
   useQueryParams,
+  UnstableGuidedTour,
 } from '@strapi/admin/strapi-admin';
 import { Grid, Main, Tabs } from '@strapi/design-system';
 import { useIntl } from 'react-intl';
@@ -175,19 +176,27 @@ const EditViewPage = () => {
                   </>
                 ) : null}
               </Tabs.List>
-              <Grid.Root paddingTop={8} gap={4}>
-                <Grid.Item col={9} s={12} direction="column" alignItems="stretch">
-                  <Tabs.Content value="draft">
-                    <FormLayout layout={layout} document={doc} />
-                  </Tabs.Content>
-                  <Tabs.Content value="published">
-                    <FormLayout layout={layout} document={doc} />
-                  </Tabs.Content>
-                </Grid.Item>
-                <Grid.Item col={3} s={12} direction="column" alignItems="stretch">
-                  <Panels />
-                </Grid.Item>
-              </Grid.Root>
+              <UnstableGuidedTour domain="content-manager" initialStep={1}>
+                {(state) => {
+                  return (
+                    <Grid.Root paddingTop={8} gap={4}>
+                      <Grid.Item col={9} s={12} direction="column" alignItems="stretch">
+                        <Tabs.Content value="draft">
+                          <div ref={state.stepRefs[1]}>
+                            <FormLayout layout={layout} document={doc} />
+                          </div>
+                        </Tabs.Content>
+                        <Tabs.Content value="published">
+                          <FormLayout layout={layout} document={doc} />
+                        </Tabs.Content>
+                      </Grid.Item>
+                      <Grid.Item col={3} s={12} direction="column" alignItems="stretch">
+                        <Panels />
+                      </Grid.Item>
+                    </Grid.Root>
+                  );
+                }}
+              </UnstableGuidedTour>
             </Tabs.Root>
             <Blocker
               // We reset the form to the published version to avoid errors like – https://strapi-inc.atlassian.net/browse/CONTENT-2284

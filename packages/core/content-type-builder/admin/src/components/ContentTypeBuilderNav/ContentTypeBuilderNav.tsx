@@ -1,6 +1,6 @@
 import { Fragment, useState, useEffect } from 'react';
 
-import { ConfirmDialog, SubNav } from '@strapi/admin/strapi-admin';
+import { ConfirmDialog, SubNav, UnstableGuidedTour } from '@strapi/admin/strapi-admin';
 import {
   Box,
   TextInput,
@@ -191,6 +191,9 @@ export const ContentTypeBuilderNav = () => {
           size="S"
         />
       </Flex>
+      <UnstableGuidedTour domain="content-type-builder">
+        {(state) => <div ref={state.stepRefs[1]}>TEST</div>}
+      </UnstableGuidedTour>
       <SubNav.Sections>
         {menu.map((section) => (
           <Fragment key={section.name}>
