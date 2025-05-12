@@ -180,7 +180,7 @@ const EditViewPage = () => {
               <Grid.Root paddingTop={8} gap={4}>
                 <Grid.Item col={9} s={12} direction="column" alignItems="stretch">
                   <Tabs.Content value="draft">
-                    <GuidedTourPopover stepIndex={1}>
+                    <GuidedTourPopover feature="contentManager" stepIndex={1}>
                       <FormLayout layout={layout} document={doc} />
                     </GuidedTourPopover>
                   </Tabs.Content>

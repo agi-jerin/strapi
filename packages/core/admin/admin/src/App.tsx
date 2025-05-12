@@ -23,6 +23,17 @@ interface AppProps {
   store: Store;
 }
 
+type Step = {
+  title: string;
+  content: string;
+  // Do stuff (ie update local storage) then dispatch the next_step action
+  next: (state: State, dispatch: React.Dispatch<Action>) => void;
+  // Do stuff (ie update local storage) then dispatch the skip_feature action
+  // skip: (state: State, dispatch: React.Dispatch<Action>) => void;
+};
+
+export type Tours = { feature: string; steps: Step[] }[];
+
 type Action =
   | {
       type: 'init';
@@ -35,60 +46,12 @@ type Action =
     };
 
 type State = {
-  currentTour: 'content-type-builder' | 'content-manager';
   currentStepIndex: number;
-};
-
-const mockSteps = {
-  contentTypeBuilder: [
-    {
-      title: 'Step 1 ctb',
-      content: 'Step 1 content',
-      next: () => {},
-    },
-    {
-      title: 'Step 2 ctb',
-      content: 'Step 2 content',
-      next: () => {},
-    },
-    {
-      title: 'Step 3 ctb',
-      content: 'Step 3 content',
-      next: () => {},
-    },
-  ],
-  contentManager: [
-    {
-      title: 'Step 1 cm',
-      content: 'Step 1 content',
-      next: () => {},
-    },
-    {
-      title: 'Step 2 cm',
-      content: 'Step 2 content',
-      next: () => {},
-    },
-  ],
+  tours: Tours;
 };
 
 function reducer(state: State, action: Action): State {
-  if (action.type === 'init') {
-    const mockLocalStorageValue = 'content-manager';
-
-    return {
-      ...state,
-      currentTour: mockLocalStorageValue,
-    };
-  }
-
   if (action.type === 'next_step') {
-    // if (state.currentStepIndex === state.stepRefs.length - 1) {
-    //   return {
-    //     ...state,
-    //     currentStepIndex: 0,
-    //   };
-    // }
-
     const nextStepIndex = state.currentStepIndex + 1;
 
     return {
@@ -108,44 +71,36 @@ export const [GuidedTourProviderImpl, unstableUseGuidedTour] = createContext<{
 export const GuidedTourPopover = ({
   children,
   stepIndex,
+  feature,
 }: {
   children: React.ReactNode;
   stepIndex: number;
+  feature: string;
 }) => {
   const state = unstableUseGuidedTour('GuidedTourPopover', (s) => s.state);
   const dispatch = unstableUseGuidedTour('GuidedTourPopover', (s) => s.dispatch);
+  // Derived from steps, the next tour will be the first item in the array,
+  // Each time a tour is completed it is removed from the array
+  const mockLocalStorageTours = state.tours.map((tour) => tour.feature);
+  console.log(mockLocalStorageTours);
+  // All tours have been completed
+  if (!mockLocalStorageTours.length) {
+    return children;
+  }
 
-  const stepContent = {
-    'content-manager': [
-      {
-        title: 'Step 1 cm',
-        content: 'Step 1 content',
-        next: () => dispatch({ type: 'next_step' }),
-      },
-      {
-        title: 'Step 2 cm',
-        content: 'Step 2 content',
-        next: () => dispatch({ type: 'next_step' }),
-      },
-    ],
-    'content-type-builder': [
-      {
-        title: 'Step 1 ctb',
-        content: 'Step 1 content',
-        next: () => dispatch({ type: 'next_step' }),
-      },
-      {
-        title: 'Step 2 ctb',
-        content: 'Step 2 content',
-        next: () => dispatch({ type: 'next_step' }),
-      },
-      {
-        title: 'Step 3 ctb',
-        content: 'Step 3 content',
-        next: () => dispatch({ type: 'next_step' }),
-      },
-    ],
-  };
+  // If the feature is not in the list, skip it
+  if (!mockLocalStorageTours.includes(feature)) {
+    return children;
+  }
+
+  // The tour should display in order
+  // Confirm the next tour is the current tour
+  const nextTour = state.tours[1];
+  if (nextTour.feature !== feature) {
+    return children;
+  }
+
+  const stepContent = nextTour.steps[stepIndex];
   const isCurrentStep = state.currentStepIndex === stepIndex;
 
   return (
@@ -158,9 +113,9 @@ export const GuidedTourPopover = ({
           className="bg-white border p-2 shadow rounded"
           style={{ padding: '2rem', backgroundColor: 'yellow' }}
         >
-          <Flex>{stepContent['content-manager'][stepIndex].title}</Flex>
-          <Flex>{stepContent['content-manager'][stepIndex].content}</Flex>
-          <Button onClick={() => stepContent['content-manager'][stepIndex].next}>Next</Button>
+          <Flex>{stepContent?.title}</Flex>
+          <Flex>{stepContent?.content}</Flex>
+          <Button onClick={() => stepContent?.next(state, dispatch)}>Next</Button>
         </PopoverContent>
       </PopoverPortal>
     </Popover>
@@ -169,16 +124,14 @@ export const GuidedTourPopover = ({
 
 export const UnstableGuidedTourProvider = ({
   children,
-  domain,
-  initialStep = 0,
+  tours,
 }: {
   children: React.ReactNode;
-  domain: 'content-manager' | 'content-type-builder';
-  initialStep?: number;
+  tours: Tours;
 }) => {
   const [state, dispatch] = React.useReducer(reducer, {
-    currentTour: domain,
     currentStepIndex: 0,
+    tours,
   });
 
   return (

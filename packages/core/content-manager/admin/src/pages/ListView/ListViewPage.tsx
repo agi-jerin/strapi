@@ -279,7 +279,7 @@ const ListViewPage = () => {
           }
         />
 
-        <GuidedTourPopover stepIndex={0}>
+        <GuidedTourPopover feature="contentManager" stepIndex={0}>
           <Layouts.Content>
             <Box background="neutral0" shadow="filterShadow" hasRadius>
               <EmptyStateLayout

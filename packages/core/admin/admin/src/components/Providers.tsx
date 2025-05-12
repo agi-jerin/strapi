@@ -3,7 +3,7 @@ import * as React from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Provider } from 'react-redux';
 
-import { UnstableGuidedTourProvider } from '../App';
+import { Tours, UnstableGuidedTourProvider } from '../App';
 import { AuthProvider } from '../features/Auth';
 import { HistoryProvider } from '../features/BackButton';
 import { ConfigurationProvider } from '../features/Configuration';
@@ -32,6 +32,44 @@ interface ProvidersProps {
   store: Store;
 }
 
+const tours: Tours = [
+  {
+    feature: 'contentTypeBuilder',
+    steps: [
+      {
+        title: 'Step 1 ctb',
+        content: 'Step 1 content',
+        next: (_, dispatch) => dispatch({ type: 'next_step' }),
+      },
+      {
+        title: 'Step 2 ctb',
+        content: 'Step 2 content',
+        next: (_, dispatch) => dispatch({ type: 'next_step' }),
+      },
+      {
+        title: 'Step 3 ctb',
+        content: 'Step 3 content',
+        next: (_, dispatch) => dispatch({ type: 'next_step' }),
+      },
+    ],
+  },
+  {
+    feature: 'contentManager',
+    steps: [
+      {
+        title: 'Step 1 cm',
+        content: 'Step 1 content',
+        next: (_, dispatch) => dispatch({ type: 'next_step' }),
+      },
+      {
+        title: 'Step 2 cm',
+        content: 'Step 2 content',
+        next: (_, dispatch) => dispatch({ type: 'next_step' }),
+      },
+    ],
+  },
+];
+
 const Providers = ({ children, strapi, store }: ProvidersProps) => {
   return (
     <StrapiAppProvider
@@ -58,7 +96,7 @@ const Providers = ({ children, strapi, store }: ProvidersProps) => {
                   <NotificationsProvider>
                     <TrackingProvider>
                       <GuidedTourProvider>
-                        <UnstableGuidedTourProvider domain="content-manager">
+                        <UnstableGuidedTourProvider tours={tours}>
                           <ConfigurationProvider
                             defaultAuthLogo={strapi.configurations.authLogo}
                             defaultMenuLogo={strapi.configurations.menuLogo}
