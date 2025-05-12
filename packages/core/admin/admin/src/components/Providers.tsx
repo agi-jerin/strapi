@@ -3,6 +3,7 @@ import * as React from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Provider } from 'react-redux';
 
+import { UnstableGuidedTourProvider } from '../App';
 import { AuthProvider } from '../features/Auth';
 import { HistoryProvider } from '../features/BackButton';
 import { ConfigurationProvider } from '../features/Configuration';
@@ -57,13 +58,15 @@ const Providers = ({ children, strapi, store }: ProvidersProps) => {
                   <NotificationsProvider>
                     <TrackingProvider>
                       <GuidedTourProvider>
-                        <ConfigurationProvider
-                          defaultAuthLogo={strapi.configurations.authLogo}
-                          defaultMenuLogo={strapi.configurations.menuLogo}
-                          showReleaseNotification={strapi.configurations.notifications.releases}
-                        >
-                          {children}
-                        </ConfigurationProvider>
+                        <UnstableGuidedTourProvider domain="content-manager">
+                          <ConfigurationProvider
+                            defaultAuthLogo={strapi.configurations.authLogo}
+                            defaultMenuLogo={strapi.configurations.menuLogo}
+                            showReleaseNotification={strapi.configurations.notifications.releases}
+                          >
+                            {children}
+                          </ConfigurationProvider>
+                        </UnstableGuidedTourProvider>
                       </GuidedTourProvider>
                     </TrackingProvider>
                   </NotificationsProvider>
