@@ -9,7 +9,7 @@ import {
   useQueryParams,
   GuidedTourPopover,
 } from '@strapi/admin/strapi-admin';
-import { Grid, Main, Tabs } from '@strapi/design-system';
+import { Flex, Grid, Main, Tabs } from '@strapi/design-system';
 import { useIntl } from 'react-intl';
 import { useLocation, useParams } from 'react-router-dom';
 import { styled } from 'styled-components';
@@ -180,7 +180,7 @@ const EditViewPage = () => {
               <Grid.Root paddingTop={8} gap={4}>
                 <Grid.Item col={9} s={12} direction="column" alignItems="stretch">
                   <Tabs.Content value="draft">
-                    <GuidedTourPopover feature="contentManager" stepIndex={1}>
+                    <GuidedTourPopover feature="contentManager" step={1} render={<div>hey</div>}>
                       <FormLayout layout={layout} document={doc} />
                     </GuidedTourPopover>
                   </Tabs.Content>

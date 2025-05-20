@@ -23,16 +23,7 @@ interface AppProps {
   store: Store;
 }
 
-type Step = {
-  title: string;
-  content: string;
-  // Do stuff (ie update local storage) then dispatch the next_step action
-  next: (state: State, dispatch: React.Dispatch<Action>) => void;
-  // Do stuff (ie update local storage) then dispatch the skip_feature action
-  // skip: (state: State, dispatch: React.Dispatch<Action>) => void;
-};
-
-export type Tours = { feature: string; steps: Step[] }[];
+export type Tours = { feature: string; stepCount: number; [key: string]: unknown }[];
 
 type Action =
   | {
@@ -46,17 +37,17 @@ type Action =
     };
 
 type State = {
-  currentStepIndex: number;
+  currentStep: number;
   tours: Tours;
 };
 
 function reducer(state: State, action: Action): State {
   if (action.type === 'next_step') {
-    const nextStepIndex = state.currentStepIndex + 1;
+    const nextStep = state.currentStep + 1;
 
     return {
       ...state,
-      currentStepIndex: nextStepIndex,
+      currentStep: nextStep,
     };
   }
 
@@ -70,19 +61,22 @@ export const [GuidedTourProviderImpl, unstableUseGuidedTour] = createContext<{
 
 export const GuidedTourPopover = ({
   children,
-  stepIndex,
+  render,
+  step,
+  skip,
   feature,
 }: {
   children: React.ReactNode;
-  stepIndex: number;
+  render: React.ReactNode;
+  step: number;
+  skip: boolean;
   feature: string;
 }) => {
   const state = unstableUseGuidedTour('GuidedTourPopover', (s) => s.state);
-  const dispatch = unstableUseGuidedTour('GuidedTourPopover', (s) => s.dispatch);
-  // Derived from steps, the next tour will be the first item in the array,
+  // Derived from tours, the next tour will be the first item in the array,
   // Each time a tour is completed it is removed from the array
   const mockLocalStorageTours = state.tours.map((tour) => tour.feature);
-  console.log(mockLocalStorageTours);
+
   // All tours have been completed
   if (!mockLocalStorageTours.length) {
     return children;
@@ -93,15 +87,7 @@ export const GuidedTourPopover = ({
     return children;
   }
 
-  // The tour should display in order
-  // Confirm the next tour is the current tour
-  const nextTour = state.tours[1];
-  if (nextTour.feature !== feature) {
-    return children;
-  }
-
-  const stepContent = nextTour.steps[stepIndex];
-  const isCurrentStep = state.currentStepIndex === stepIndex;
+  const isCurrentStep = state.currentStep === step;
 
   return (
     <Popover open={isCurrentStep}>
@@ -110,12 +96,9 @@ export const GuidedTourPopover = ({
         <PopoverContent
           side="top"
           align="start"
-          className="bg-white border p-2 shadow rounded"
           style={{ padding: '2rem', backgroundColor: 'yellow' }}
         >
-          <Flex>{stepContent?.title}</Flex>
-          <Flex>{stepContent?.content}</Flex>
-          <Button onClick={() => stepContent?.next(state, dispatch)}>Next</Button>
+          {render}
         </PopoverContent>
       </PopoverPortal>
     </Popover>
@@ -130,7 +113,7 @@ export const UnstableGuidedTourProvider = ({
   tours: Tours;
 }) => {
   const [state, dispatch] = React.useReducer(reducer, {
-    currentStepIndex: 0,
+    currentStep: 1,
     tours,
   });
 

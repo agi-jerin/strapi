@@ -78,6 +78,7 @@ const ListViewPage = () => {
   const [displayedHeaders, setDisplayedHeaders] = React.useState<ListFieldLayout[]>([]);
 
   const state = unstableUseGuidedTour('ListViewPage', (s) => s.state);
+  const dispatch = unstableUseGuidedTour('ListViewPage', (s) => s.dispatch);
 
   const listLayout = usePrev(list.layout);
   React.useEffect(() => {
@@ -279,7 +280,18 @@ const ListViewPage = () => {
           }
         />
 
-        <GuidedTourPopover feature="contentManager" stepIndex={0}>
+        <GuidedTourPopover
+          feature="contentManager"
+          step={1}
+          skip={false}
+          render={
+            <>
+              <Flex>Test 1 title</Flex>
+              <Flex>Test 1 content</Flex>
+              <Button onClick={() => dispatch({ type: 'next_step' })}>Next</Button>
+            </>
+          }
+        >
           <Layouts.Content>
             <Box background="neutral0" shadow="filterShadow" hasRadius>
               <EmptyStateLayout
