@@ -15,7 +15,7 @@ import {
   Layouts,
   useTable,
   unstableUseGuidedTour,
-  GuidedTourPopover,
+  cmTour,
 } from '@strapi/admin/strapi-admin';
 import {
   Button,
@@ -280,18 +280,7 @@ const ListViewPage = () => {
           }
         />
 
-        <GuidedTourPopover
-          feature="contentManager"
-          step={1}
-          skip={false}
-          render={
-            <>
-              <Flex>Test 1 title</Flex>
-              <Flex>Test 1 content</Flex>
-              <Button onClick={() => dispatch({ type: 'next_step' })}>Next</Button>
-            </>
-          }
-        >
+        <cmTour.ListViewEmpty>
           <Layouts.Content>
             <Box background="neutral0" shadow="filterShadow" hasRadius>
               <EmptyStateLayout
@@ -305,7 +294,7 @@ const ListViewPage = () => {
               />
             </Box>
           </Layouts.Content>
-        </GuidedTourPopover>
+        </cmTour.ListViewEmpty>
       </Page.Main>
     );
   }

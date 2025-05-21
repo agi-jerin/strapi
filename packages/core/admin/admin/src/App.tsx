@@ -59,31 +59,55 @@ export const [GuidedTourProviderImpl, unstableUseGuidedTour] = createContext<{
   dispatch: React.Dispatch<Action>;
 }>('GuidedTour');
 
+// function createTour(step: Record<string, React.ComponentType>) {
+
+//   return steps
+//   const componentDictionary: Record<string, React.ComponentType> = {};
+
+//   steps.forEach(step => {
+//     componentDictionary[]
+//   })
+
+//   return componentDictionary;
+// }
+
+// const tours = {
+//   contentManager: createTour([{key: ''}])
+// }
+
+export const cmTour = {
+  ListViewEmpty: ({ children }: { children: React.ReactNode }) => (
+    <GuidedTourPopover
+      step={1}
+      render={(_, dispatch) => (
+        <>
+          <div>This is step 1</div>
+          <Button onClick={() => dispatch({ type: 'next_step' })}>Next!</Button>
+        </>
+      )}
+    >
+      {children}
+    </GuidedTourPopover>
+  ),
+};
+
 export const GuidedTourPopover = ({
   children,
   render,
   step,
-  skip,
-  feature,
 }: {
   children: React.ReactNode;
-  render: React.ReactNode;
+  render: (state: State, dispatch: React.Dispatch<Action>) => React.ReactNode;
   step: number;
-  skip: boolean;
-  feature: string;
 }) => {
   const state = unstableUseGuidedTour('GuidedTourPopover', (s) => s.state);
+  const dispatch = unstableUseGuidedTour('GuidedTourPopover', (s) => s.dispatch);
   // Derived from tours, the next tour will be the first item in the array,
   // Each time a tour is completed it is removed from the array
   const mockLocalStorageTours = state.tours.map((tour) => tour.feature);
 
   // All tours have been completed
   if (!mockLocalStorageTours.length) {
-    return children;
-  }
-
-  // If the feature is not in the list, skip it
-  if (!mockLocalStorageTours.includes(feature)) {
     return children;
   }
 
@@ -95,10 +119,10 @@ export const GuidedTourPopover = ({
       <PopoverPortal>
         <PopoverContent
           side="top"
-          align="start"
-          style={{ padding: '2rem', backgroundColor: 'yellow' }}
+          align="center"
+          style={{ padding: '2rem', backgroundColor: 'green' }}
         >
-          {render}
+          {render(state, dispatch)}
         </PopoverContent>
       </PopoverPortal>
     </Popover>
