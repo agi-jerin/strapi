@@ -1,5 +1,5 @@
 /* eslint-disable import/no-default-export */
-import { useTracking, Layouts } from '@strapi/admin/strapi-admin';
+import { useTracking, Layouts, tours } from '@strapi/admin/strapi-admin';
 import { Box, Button, Flex, Typography } from '@strapi/design-system';
 import { Information, Pencil, Plus } from '@strapi/icons';
 import upperFirst from 'lodash/upperFirst';
@@ -163,15 +163,17 @@ const ListView = () => {
       )}
       <LayoutsHeaderCustom id="title" primaryAction={primaryAction} title={upperFirst(label)} />
       <Layouts.Content>
-        <Box
-          background="neutral0"
-          shadow="filterShadow"
-          hasRadius
-          overflow="auto"
-          borderColor="neutral150"
-        >
-          <List type={type} addComponentToDZ={handleClickAddComponentToDZ} isMain />
-        </Box>
+        <tours.contentTypeBuilder.Intro>
+          <Box
+            background="neutral0"
+            shadow="filterShadow"
+            hasRadius
+            overflow="auto"
+            borderColor="neutral150"
+          >
+            <List type={type} addComponentToDZ={handleClickAddComponentToDZ} isMain />
+          </Box>
+        </tours.contentTypeBuilder.Intro>
       </Layouts.Content>
     </>
   );

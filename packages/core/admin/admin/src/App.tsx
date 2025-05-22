@@ -25,29 +25,24 @@ interface AppProps {
 
 export type Tours = { feature: string; stepCount: number; [key: string]: unknown }[];
 
-type Action =
-  | {
-      type: 'init';
-    }
-  | {
-      type: 'start_tour';
-    }
-  | {
-      type: 'next_step';
-    };
+type Action = {
+  type: 'next_step';
+  payload: string;
+};
 
 type State = {
-  currentStep: number;
+  currentSteps: Record<string, number>;
   tours: Tours;
 };
 
 function reducer(state: State, action: Action): State {
   if (action.type === 'next_step') {
-    const nextStep = state.currentStep + 1;
-
     return {
       ...state,
-      currentStep: nextStep,
+      currentSteps: {
+        ...state.currentSteps,
+        [action.payload]: state.currentSteps[action.payload] + 1,
+      },
     };
   }
 
@@ -65,6 +60,7 @@ type TourStep<P extends string> = {
 };
 
 function createTour<const T extends ReadonlyArray<TourStep<string>>>(
+  tourName: string,
   steps: T
 ): {
   [K in T[number]['position']]: React.FC<{ children: React.ReactNode }>;
@@ -79,7 +75,7 @@ function createTour<const T extends ReadonlyArray<TourStep<string>>>(
     }
 
     tour[step.position] = ({ children }: { children: React.ReactNode }) => (
-      <GuidedTourPopover step={index + 1} render={step.content}>
+      <GuidedTourPopover step={index} content={step.content}>
         {children}
       </GuidedTourPopover>
     );
@@ -88,54 +84,83 @@ function createTour<const T extends ReadonlyArray<TourStep<string>>>(
   return tour as { [K in T[number]['position']]: React.FC<{ children: React.ReactNode }> };
 }
 
+// Object of React components to help building the UI (Title, Actions...)
+// const Step: Record<string, React.ComponentType = {};
+
 export const tours = {
-  contentManager: createTour([
+  contentManager: createTour('contentManager', [
     {
-      // this be the step id instead of using a number
-      // auto format/enforce pascal case?
       position: 'ListViewEmpty',
-      content: (_, dispatch) => (
+      content: (Step) => (
         <>
           <div>This is step 1</div>
-          <Button onClick={() => dispatch({ type: 'next_step' })}>Next!</Button>
+          <Step.Actions />
+          {/* <Button onClick={() => dispatch({ type: 'next_step', payload: 'contentManager' })}>Next!</Button> */}
         </>
       ),
     },
-    {
-      // this be the step id instead of using a number
-      // auto format/enforce pascal case?
-      position: 'EditViewPageIntro',
-      content: (_, dispatch) => (
-        <>
-          <div>This is step 2</div>
-          <Button onClick={() => dispatch({ type: 'next_step' })}>Next!</Button>
-        </>
-      ),
-    },
+    // {
+    //   position: 'EditViewPageIntro',
+    //   content: (_, dispatch) => (
+    //     <>
+    //       <div>This is step 2</div>
+    //       <Button onClick={() => dispatch({ type: 'next_step' })}>Next!</Button>
+    //     </>
+    //   ),
+    // },
   ]),
+  // contentTypeBuilder: createTour('contentTypeBuilder', [
+  //   {
+  //     position: 'Intro',
+  //     content: (_, dispatch) => (
+  //       <>
+  //         <div>CTB This is step 1</div>
+  //         <Button onClick={() => dispatch({ type: 'next_step' })}>Next!</Button>
+  //       </>
+  //     ),
+  //   },
+  //   {
+  //     position: 'CreateSchema',
+  //     content: (_, dispatch) => (
+  //       <>
+  //         <div>CTB This is step 2</div>
+  //         <Button onClick={() => dispatch({ type: 'next_step' })}>Next!</Button>
+  //       </>
+  //     ),
+  //   },
+  // ]),
+};
+
+// const Step.Content = () => {}
+// const Step.Title = () => {}
+// const Step.Description = () => {}
+// const Step.Actions = () => {}
+
+const GenericStep = {
+  Actions: ({ feature, dispatch }: { feature: string; dispatch: React.Dispatch<Action> }) => {
+    return <Button onClick={() => dispatch({ type: 'next_step', payload: feature })}>Next!</Button>;
+  },
 };
 
 export const GuidedTourPopover = ({
   children,
-  render,
+  content,
   step,
+  feature,
 }: {
   children: React.ReactNode;
-  render: (state: State, dispatch: React.Dispatch<Action>) => React.ReactNode;
+  content: (Step: typeof GenericStep) => React.ReactNode;
   step: number;
+  feature: string;
 }) => {
   const state = unstableUseGuidedTour('GuidedTourPopover', (s) => s.state);
   const dispatch = unstableUseGuidedTour('GuidedTourPopover', (s) => s.dispatch);
-  // Derived from tours, the next tour will be the first item in the array,
-  // Each time a tour is completed it is removed from the array
-  const mockLocalStorageTours = state.tours.map((tour) => tour.feature);
 
-  // All tours have been completed
-  if (!mockLocalStorageTours.length) {
-    return children;
-  }
+  const isCurrentStep = state.currentSteps[feature] === step;
 
-  const isCurrentStep = state.currentStep === step;
+  const Step = {
+    Actions: () => <GenericStep.Actions dispatch={dispatch} feature={feature} />,
+  };
 
   return (
     <Popover open={isCurrentStep}>
@@ -146,7 +171,7 @@ export const GuidedTourPopover = ({
           align="center"
           style={{ padding: '2rem', backgroundColor: 'green' }}
         >
-          {render(state, dispatch)}
+          {content(Step)}
         </PopoverContent>
       </PopoverPortal>
     </Popover>
@@ -161,7 +186,7 @@ export const UnstableGuidedTourProvider = ({
   tours: Tours;
 }) => {
   const [state, dispatch] = React.useReducer(reducer, {
-    currentStep: 1,
+    currentStep: 0,
     tours,
   });
 
