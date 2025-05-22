@@ -7,7 +7,7 @@ import {
   useRBAC,
   useNotification,
   useQueryParams,
-  GuidedTourPopover,
+  tours,
 } from '@strapi/admin/strapi-admin';
 import { Flex, Grid, Main, Tabs } from '@strapi/design-system';
 import { useIntl } from 'react-intl';
@@ -180,9 +180,9 @@ const EditViewPage = () => {
               <Grid.Root paddingTop={8} gap={4}>
                 <Grid.Item col={9} s={12} direction="column" alignItems="stretch">
                   <Tabs.Content value="draft">
-                    <GuidedTourPopover feature="contentManager" step={1} render={<div>hey</div>}>
+                    <tours.contentManager.EditViewPageIntro>
                       <FormLayout layout={layout} document={doc} />
-                    </GuidedTourPopover>
+                    </tours.contentManager.EditViewPageIntro>
                   </Tabs.Content>
                   <Tabs.Content value="published">
                     <FormLayout layout={layout} document={doc} />

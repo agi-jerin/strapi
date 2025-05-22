@@ -15,7 +15,7 @@ import {
   Layouts,
   useTable,
   unstableUseGuidedTour,
-  cmTour,
+  tours,
 } from '@strapi/admin/strapi-admin';
 import {
   Button,
@@ -280,7 +280,7 @@ const ListViewPage = () => {
           }
         />
 
-        <cmTour.ListViewEmpty>
+        <tours.contentManager.ListViewEmpty>
           <Layouts.Content>
             <Box background="neutral0" shadow="filterShadow" hasRadius>
               <EmptyStateLayout
@@ -294,7 +294,7 @@ const ListViewPage = () => {
               />
             </Box>
           </Layouts.Content>
-        </cmTour.ListViewEmpty>
+        </tours.contentManager.ListViewEmpty>
       </Page.Main>
     );
   }

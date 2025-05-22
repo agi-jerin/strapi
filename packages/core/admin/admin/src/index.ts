@@ -25,12 +25,7 @@ export * from './components/ContentBox';
 export * from './components/SubNav';
 
 export { useGuidedTour } from './components/GuidedTour/Provider';
-export {
-  UnstableGuidedTourProvider,
-  unstableUseGuidedTour,
-  GuidedTourPopover,
-  cmTour,
-} from './App';
+export { UnstableGuidedTourProvider, unstableUseGuidedTour, GuidedTourPopover, tours } from './App';
 
 /**
  * Features

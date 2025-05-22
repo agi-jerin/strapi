@@ -59,36 +59,60 @@ export const [GuidedTourProviderImpl, unstableUseGuidedTour] = createContext<{
   dispatch: React.Dispatch<Action>;
 }>('GuidedTour');
 
-// function createTour(step: Record<string, React.ComponentType>) {
+type TourStep<P extends string> = {
+  position: P;
+  content: (state: State, dispatch: React.Dispatch<Action>) => React.ReactNode;
+};
 
-//   return steps
-//   const componentDictionary: Record<string, React.ComponentType> = {};
+function createTour<const T extends ReadonlyArray<TourStep<string>>>(
+  steps: T
+): {
+  [K in T[number]['position']]: React.FC<{ children: React.ReactNode }>;
+} {
+  const tour: {
+    [position: string]: React.FC<{ children: React.ReactNode }>;
+  } = {};
 
-//   steps.forEach(step => {
-//     componentDictionary[]
-//   })
+  steps.forEach((step, index) => {
+    if (Object.keys(tour).includes(step.position)) {
+      throw Error('The tour step has already been registered');
+    }
 
-//   return componentDictionary;
-// }
+    tour[step.position] = ({ children }: { children: React.ReactNode }) => (
+      <GuidedTourPopover step={index + 1} render={step.content}>
+        {children}
+      </GuidedTourPopover>
+    );
+  });
 
-// const tours = {
-//   contentManager: createTour([{key: ''}])
-// }
+  return tour as { [K in T[number]['position']]: React.FC<{ children: React.ReactNode }> };
+}
 
-export const cmTour = {
-  ListViewEmpty: ({ children }: { children: React.ReactNode }) => (
-    <GuidedTourPopover
-      step={1}
-      render={(_, dispatch) => (
+export const tours = {
+  contentManager: createTour([
+    {
+      // this be the step id instead of using a number
+      // auto format/enforce pascal case?
+      position: 'ListViewEmpty',
+      content: (_, dispatch) => (
         <>
           <div>This is step 1</div>
           <Button onClick={() => dispatch({ type: 'next_step' })}>Next!</Button>
         </>
-      )}
-    >
-      {children}
-    </GuidedTourPopover>
-  ),
+      ),
+    },
+    {
+      // this be the step id instead of using a number
+      // auto format/enforce pascal case?
+      position: 'EditViewPageIntro',
+      content: (_, dispatch) => (
+        <>
+          <div>This is step 2</div>
+          <Button onClick={() => dispatch({ type: 'next_step' })}>Next!</Button>
+        </>
+      ),
+    },
+  ]),
 };
 
 export const GuidedTourPopover = ({
