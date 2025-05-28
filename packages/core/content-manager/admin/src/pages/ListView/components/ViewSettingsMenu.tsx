@@ -84,13 +84,15 @@ const FieldPicker = ({ headers = [], resetHeaders, setHeaders }: FieldPickerProp
   const { formatMessage, locale } = useIntl();
 
   const { schema, model } = useDoc();
-  const { list } = useDocumentLayout(model);
+  const { list, edit } = useDocumentLayout(model);
 
   const formatter = useCollator(locale, {
     sensitivity: 'base',
   });
 
   const attributes = schema?.attributes ?? {};
+
+  console.log(list, edit);
 
   const columns = Object.keys(attributes)
     .filter((name) => checkIfAttributeIsDisplayable(attributes[name]))

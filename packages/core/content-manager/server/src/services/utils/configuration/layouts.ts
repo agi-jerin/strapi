@@ -38,7 +38,7 @@ async function createDefaultLayouts(schema: any) {
 
 function createDefaultListLayout(schema: any) {
   return Object.keys(schema.attributes)
-    .filter((name) => isListable(schema, name))
+    .filter((name) => isListable(schema, name) && name !== 'documentId')
     .slice(0, DEFAULT_LIST_LENGTH);
 }
 
@@ -54,6 +54,8 @@ function createDefaultEditLayout(schema: any) {
 
 function syncLayouts(configuration: any, schema: any) {
   if (_.isEmpty(configuration.layouts)) return createDefaultLayouts(schema);
+
+  console.log(configuration);
 
   const { list = [], editRelations = [], edit = [] } = configuration.layouts || {};
 
